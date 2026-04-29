@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tienda {
+  id          String      @id @default(cuid())
+  nombre      String
+  clave       String      @unique
+  usuarios    Usuario[]
+  solicitudes Solicitud[]
+  creadoEn    DateTime    @default(now())
+}
+
+model Usuario {
+  id          String      @id @default(cuid())
+  nombre      String
+  email       String      @unique
+  rol         Rol
+  tiendaId    String?
+  tienda      Tienda?     @relation(fields: [tiendaId], references: [id])
+  solicitudes Solicitud[] @relation("LiderSolicitudes")
+  creadoEn    DateTime    @default(now())
+}
+
+model Producto {
+  id           String      @id @default(cuid())
+  nombre       String
+  codigoBarras String      @unique
+  descripcion  String?
+  solicitudes  Solicitud[]
+  creadoEn     DateTime    @default(now())
+}
+
+model Solicitud {
+  id             String         @id @default(cuid())
+  producto       Producto       @relation(fields: [productoId], references: [id])
+  productoId     String
+  cantidad       Int
+  justificacion  String
+  estatus        EstatusSolicitud @default(PENDIENTE_ASESOR)
+  motivoRechazo  String?
+  tienda         Tienda         @relation(fields: [tiendaId], references: [id])
+  tiendaId       String
+  lider          Usuario        @relation("LiderSolicitudes", fields: [liderId], references: [id])
+  liderId        String
+  creadoEn       DateTime       @default(now())
+  actualizadoEn  DateTime       @updatedAt
+
+  @@index([estatus])
+  @@index([tiendaId])
+}
+
+enum Rol {
+  LIDER
+  ASESOR
+  COMERCIAL
+  EJECUTOR
+}
+
+enum EstatusSolicitud {
+  PENDIENTE_ASESOR
+  PENDIENTE_COMERCIAL
+  APROBADO
+  RECHAZADO_ASESOR
+  RECHAZADO_COMERCIAL
+}

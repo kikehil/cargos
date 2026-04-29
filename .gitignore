@@ -1,0 +1,25 @@
+# Dependencias
+node_modules/
+.pnp
+.pnp.js
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Next.js
+apps/portal/.next/
+apps/portal/out/
+
+# Expo
+apps/tienda/.expo/
+apps/tienda/dist/
+
+# Prisma
+packages/db/dist/
+
+# Misc
+.DS_Store
+*.pem
+coverage/
