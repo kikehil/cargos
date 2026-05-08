@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@oxxo/db'
+import { prisma, EstatusSolicitud } from '@oxxo/db'
 
 type Params = { params: { id: string } }
 
@@ -11,7 +11,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'Solicitud no encontrada' }, { status: 404 })
   }
 
-  const transiciones: Record<string, { aprobado: string; rechazado: string }> = {
+  const transiciones: Record<string, { aprobado: EstatusSolicitud; rechazado: EstatusSolicitud }> = {
     PENDIENTE_ASESOR:    { aprobado: 'PENDIENTE_COMERCIAL', rechazado: 'RECHAZADO_ASESOR' },
     PENDIENTE_COMERCIAL: { aprobado: 'APROBADO',            rechazado: 'RECHAZADO_COMERCIAL' },
   }
