@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "landscape",
     "scheme": "oxxo-cargos",
-    "platforms": ["android"],
+    "platforms": ["android", "ios", "web"],
     "android": {
       "package": "com.oxxo.cargos",
       "permissions": ["CAMERA"]
@@ -13,6 +13,14 @@
     "plugins": [
       "expo-router",
       ["expo-camera", { "cameraPermission": "Necesitamos acceso a la cámara para escanear productos." }]
-    ]
+    ],
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png",
+      "shortName": "OXXO Tienda",
+      "themeColor": "#E2001A",
+      "backgroundColor": "#FFFFFF",
+      "display": "standalone"
+    }
   }
 }

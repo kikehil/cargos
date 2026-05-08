@@ -10,7 +10,8 @@ datasource db {
 model Tienda {
   id          String      @id @default(cuid())
   nombre      String
-  clave       String      @unique
+  cr          String      @unique
+  asesor      String?
   usuarios    Usuario[]
   solicitudes Solicitud[]
   creadoEn    DateTime    @default(now())
@@ -20,6 +21,7 @@ model Usuario {
   id          String      @id @default(cuid())
   nombre      String
   email       String      @unique
+  password    String      @default("1234")
   rol         Rol
   tiendaId    String?
   tienda      Tienda?     @relation(fields: [tiendaId], references: [id])

@@ -49,7 +49,7 @@ export function BandejaSolicitudes({ rol }: { rol: 'ASESOR' | 'COMERCIAL' }) {
   async function accionar(id: string, accion: 'APROBAR' | 'RECHAZAR') {
     const motivo = motivoRechazo[id]
     if (accion === 'RECHAZAR' && !motivo?.trim()) {
-      alert('El motivo de rechazo es obligatorio')
+      alert('Por favor, indica un motivo para el rechazo.')
       return
     }
     const res = await fetch(`/api/solicitudes/${id}`, {
@@ -62,44 +62,78 @@ export function BandejaSolicitudes({ rol }: { rol: 'ASESOR' | 'COMERCIAL' }) {
     }
   }
 
-  if (cargando) return <p className="text-gray-400">Cargando solicitudes...</p>
-  if (!solicitudes.length) return <p className="text-gray-400">No hay solicitudes pendientes.</p>
+  if (cargando) return (
+    <div className="flex justify-center items-center py-20">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-oxxo-red"></div>
+    </div>
+  )
+
+  if (!solicitudes.length) return (
+    <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
+      <div className="text-5xl mb-4">🎉</div>
+      <h3 className="text-lg font-medium text-gray-900">¡Todo al día!</h3>
+      <p className="text-gray-500">No hay solicitudes pendientes por procesar.</p>
+    </div>
+  )
 
   return (
-    <div className="space-y-4">
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-1">
       {solicitudes.map((s) => (
-        <div key={s.id} className="bg-white rounded-xl shadow p-5">
-          <div className="flex justify-between items-start mb-3">
-            <div>
-              <p className="font-semibold text-gray-900">{s.producto.nombre}</p>
-              <p className="text-xs text-gray-400">{s.producto.codigoBarras}</p>
+        <div key={s.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+          <div className="p-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
+              <div className="flex gap-4">
+                <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-2xl">
+                  {s.producto.nombre.toLowerCase().includes('coca') ? '🥤' : 
+                   s.producto.nombre.toLowerCase().includes('café') ? '☕' : 
+                   s.producto.nombre.toLowerCase().includes('ruffles') ? '🥔' : '📦'}
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 text-lg">{s.producto.nombre}</h3>
+                  <p className="text-sm text-gray-400 font-mono">{s.producto.codigoBarras}</p>
+                </div>
+              </div>
+              <span className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full ${colorEstatus[s.estatus]}`}>
+                {etiquetaEstatus[s.estatus]}
+              </span>
             </div>
-            <span className={`text-xs font-medium px-2 py-1 rounded-full ${colorEstatus[s.estatus]}`}>
-              {etiquetaEstatus[s.estatus]}
-            </span>
-          </div>
-          <p className="text-sm text-gray-600 mb-1"><span className="font-medium">Cantidad:</span> {s.cantidad}</p>
-          <p className="text-sm text-gray-600 mb-3"><span className="font-medium">Justificación:</span> {s.justificacion}</p>
-          <div className="flex gap-2 items-center">
-            <button
-              onClick={() => accionar(s.id, 'APROBAR')}
-              className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition"
-            >
-              Aprobar
-            </button>
-            <input
-              type="text"
-              placeholder="Motivo de rechazo"
-              value={motivoRechazo[s.id] ?? ''}
-              onChange={(e) => setMotivoRechazo((prev) => ({ ...prev, [s.id]: e.target.value }))}
-              className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm"
-            />
-            <button
-              onClick={() => accionar(s.id, 'RECHAZAR')}
-              className="px-4 py-2 bg-oxxo-red text-white text-sm rounded-lg hover:bg-red-700 transition"
-            >
-              Rechazar
-            </button>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 bg-gray-50 p-4 rounded-xl">
+              <div>
+                <p className="text-xs text-gray-400 uppercase font-bold mb-1">Cantidad</p>
+                <p className="text-2xl font-black text-oxxo-red">{s.cantidad} <span className="text-sm font-normal text-gray-500">unidades</span></p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 uppercase font-bold mb-1">Motivo / Justificación</p>
+                <p className="text-sm text-gray-700 italic">"{s.justificacion}"</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  placeholder="Escribe el motivo si vas a rechazar..."
+                  value={motivoRechazo[s.id] ?? ''}
+                  onChange={(e) => setMotivoRechazo((prev) => ({ ...prev, [s.id]: e.target.value }))}
+                  className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-oxxo-red transition-all"
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => accionar(s.id, 'RECHAZAR')}
+                  className="px-6 py-3 bg-white border-2 border-oxxo-red text-oxxo-red font-bold text-sm rounded-xl hover:bg-red-50 transition shadow-sm"
+                >
+                  Rechazar
+                </button>
+                <button
+                  onClick={() => accionar(s.id, 'APROBAR')}
+                  className="px-8 py-3 bg-green-600 text-white font-bold text-sm rounded-xl hover:bg-green-700 transition shadow-md hover:shadow-lg active:scale-95"
+                >
+                  Aprobar Solicitud
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       ))}
